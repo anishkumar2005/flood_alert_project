@@ -519,7 +519,23 @@ app.get('/api/route', limiter(20, 60e3), async (req, res) => {
 //  PAGES
 // ======================================================================
 app.get('/health', (req, res) => res.send('Pravaah backend is running.'));
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/', (req, res) => {
+    const data = Object.keys(readings).map(id => {
+        const n = readings[id].latest;
+
+        return {
+            node_id: id,
+            lat: n.lat,
+            lng: n.lng,
+            water_level_cm: n.water_level_cm,
+            rate_of_rise_cm_per_min: n.rate_of_rise_cm_per_min,
+            percent_full: n.percent_full,
+            capacity_cm: n.capacity_cm
+        };
+    });
+
+    res.json(data);
+});
 app.get('/map', (req, res) => res.sendFile(path.join(__dirname, 'public', 'map.html')));
 app.get('/login', (req, res) => {
   if (currentUser(req)) return res.redirect('/dashboard');
